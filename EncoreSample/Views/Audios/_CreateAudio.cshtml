@@ -1,0 +1,38 @@
+﻿@model Audio
+
+<div class="modal-header">
+    <h3 class="text-center text-warning">Create New Audio</h3>
+    <a href="" class="closeModal" data-bs-dismiss="modal" aria-label="Close">
+        <i class="bi bi-x"></i>
+    </a>
+</div>
+<div class="modal-body">
+    <form id="createAudioForm" asp-controller="Audios" asp-action="Create" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Song" class="control-label text-dark "></label>
+            <input asp-for="Song" class="form-control" />
+            <span asp-validation-for="Song" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="OriginalArtist" class="control-label text-dark"></label>
+            <input asp-for="OriginalArtist" class="form-control" />
+            <span asp-validation-for="OriginalArtist" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="file" class="form-control" name="upload" accept="audio/*" required />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>  
+
+    <a class="text-dark" asp-controller="Audios" asp-action="Create" method="get">Record Own Track</a>
+</div> 
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial.cshtml" />
+    }
+}

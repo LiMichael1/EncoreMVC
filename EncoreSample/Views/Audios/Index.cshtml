@@ -1,0 +1,205 @@
+﻿@model IEnumerable<EncoreSample.Models.Audio>
+@{
+    ViewData["Title"] = "Index";
+    @using System.Security.Claims;
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    bool isAuthenticated = (userId != null) ? true : false;
+
+    bool IsAuthUserLikedPost(int audioId)
+    {
+        if(!isAuthenticated) return false;
+
+        var result = ((List<Vote>)ViewData["votes"]).FirstOrDefault(x => x.AudioId == audioId);
+
+        if (result == null) return false;
+
+        return (result.VoteType == 1);
+    }
+}
+
+<h1 class="page-header-text">Champion's Leaderboard</h1>
+
+<div class="d-flex justify-content-between">
+    <div>
+        <audio id="player" controls preload="none">
+            <source id="audioSource" type="audio/mp3" />
+        </audio>
+    </div>
+    <div>     
+        <button type="button" onclick="modal()" class="glow-button">
+            Create New
+        </button>
+    </div>
+</div>
+
+@*<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Song)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OriginalArtist)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubmittedOn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AudioPath)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Vote)
+            </th>
+         
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+       <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Song)
+            </td>
+            <td> 
+                @Html.DisplayFor(modelItem => item.OriginalArtist)
+            </td>
+            <td>
+                @item.SubmittedOn.ToString("MM-dd-yyyy")
+            </td>
+            <td>
+                <button class="btn btn-primary" onClick='playMusic(String.raw`@item.AudioPath`)'>
+                        <i class="bi bi-play"></i>
+                </button> 
+            </td>
+            <td id="@item.AudioId" class="votes">
+                    @{
+                        bool isPostLiked = IsAuthUserLikedPost(item.AudioId);
+                    }
+                <button class="likeBtn @(isPostLiked ? "liked" : "") " onclick="upvote(this, @item.AudioId)">
+                         <i class="bi bi-hand-thumbs-up-fill thumbsUp"></i>
+                </button>
+                
+                <p  class="voteCount d-inline">@item.Vote</p>
+            </td>
+              
+
+            <td class="table-btn">
+                <a asp-action="Edit" asp-route-id="@item.AudioId">
+                    <i class="bi bi-pen"></i>
+                 </a> |
+                <a asp-action="Details" asp-route-id="@item.AudioId">
+                   <i class="bi bi-chat-fill"></i>
+                </a>  |
+                <a asp-action="Delete" asp-route-id="@item.AudioId">
+                    <i class="bi bi-x-circle-fill"></i>
+                </a>
+            </td>
+        </tr> 
+}
+    </tbody>
+</table>  
+*@
+@foreach(var item in Model) 
+{
+<div class="row board-card">
+    <div class="col-2">
+        <div id="@item.AudioId" class="score">
+            @{
+                bool isPostLiked = IsAuthUserLikedPost(item.AudioId);
+            }
+            <button class="likeBtn @(isPostLiked ? "liked" : "") " onclick="upvote(this, @item.AudioId)">
+@*                <i class="bi bi-hand-thumbs-up-fill thumbsUp"></i>
+*@                <i class="bi bi-chevron-up"></i>
+            </button>
+
+            <h3 id="vote-@item.AudioId" class="voteCount @(isPostLiked ? "liked" : "")">@item.Vote</h3>
+        </div>
+    </div>
+
+    <div class="col-2">
+            <button class="playBtn" onClick='playMusic(this, String.raw`@item.AudioPath`)'>
+            <i class="bi bi-play"></i>
+        </button>
+    </div>
+
+    <div class="col-6 mt-3">
+        <p>  <span class="userText">@item.User.Email</span></p>
+        <p>  <span class="neonText">@item.Song</span></p>
+        <p>  <span class="neonText">@item.OriginalArtist</span></p>
+        <p>  <span class="neonText">@item.SubmittedOn.ToString("MM-dd-yyyy")</span></p>
+    </div>
+
+    <div class="col d-flex">
+        
+
+        <div class="table-btn">
+            <a asp-action="Details" asp-route-id="@item.AudioId">
+                <i class="bi bi-chat-fill"></i>
+            </a>
+            <a asp-action="Edit" asp-route-id="@item.AudioId">
+                <i class="bi bi-pen"></i>
+            </a>
+            <a asp-action="Delete" asp-route-id="@item.AudioId">
+                <i class="bi bi-x-circle-fill"></i>
+            </a>
+        </div>
+    </div>
+
+</div>
+}
+
+
+
+<partial name="_Modal" />
+
+@section scripts {
+    <script>
+        function playMusic(btn, audioPath) {
+            const player = document.getElementById('player');
+            const audioSource = document.getElementById('audioSource');
+            audioSource.setAttribute('src', audioPath);
+
+            player.load();
+            player.play();
+        }
+
+        function upvote(btn, audioId) {
+            const isAuthenticated = @((isAuthenticated) ? "true" : "false");
+
+            if (isAuthenticated) {
+                const data = {
+                    audioId: audioId,
+                    userId: "@userId",
+                }
+
+                $.post('Audio/Upvote', data, function (result) {
+                    const ele = document.getElementById(`vote-${audioId}`);
+
+                    ele.innerHTML = result;
+                    btn.classList.toggle('liked');
+                    ele.classList.toggle('liked');
+
+                    console.log(el.classList);
+
+                });
+
+
+            } else {
+                console.log('Not Authenticated');
+                return;
+            }
+
+
+        }
+
+    </script>
+     
+  
+}
+

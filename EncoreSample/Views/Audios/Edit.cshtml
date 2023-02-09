@@ -1,0 +1,55 @@
+﻿@model EncoreSample.Models.Audio
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Audio</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="AudioId" />
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <input asp-for="UserId" class="form-control" disabled />
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Song" class="control-label"></label>
+                <input asp-for="Song" class="form-control" />
+                <span asp-validation-for="Song" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OriginalArtist" class="control-label"></label>
+                <input asp-for="OriginalArtist" class="form-control" />
+                <span asp-validation-for="OriginalArtist" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubmittedOn" class="control-label"></label>
+                <input asp-for="SubmittedOn" class="form-control" />
+                <span asp-validation-for="SubmittedOn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AudioPath" class="control-label"></label>
+                <input asp-for="AudioPath" class="form-control" />
+                <span asp-validation-for="AudioPath" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
